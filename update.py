@@ -12,6 +12,12 @@ import os
 # To parse CSV
 import csv
 
+# Convert latin-1 to unicode
+def unicode_csv_reader(utf8_data, dialect=csv.excel, **kwargs):
+    csv_reader = csv.reader(utf8_data, dialect=dialect, **kwargs)
+    for row in csv_reader:
+        yield [unicode(cell, 'latin-1') for cell in row]
+
 # Root directory to iterate over files
 dirName = 'csvFiles'
 
@@ -32,7 +38,9 @@ for path, subdirs, files in os.walk(dirName):
             print f
             ws = wb.create_sheet(f)
             # Read CSV file contents
-            reader = csv.reader(open(os.path.join(basePath,f)), delimiter=',')
+            # Call this if CSV is latin-1 encoding
+            #reader = unicode_csv_reader(open(os.path.join(basePath, f)))
+            reader = csv.reader(open(os.path.join(basePath, f)))
             for row in reader:
                 ws.append(row)
             ws['B1'] = 'Enter Word'
